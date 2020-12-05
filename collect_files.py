@@ -11,7 +11,6 @@ def moodle_gradesheet(notebook_name, assign_name, csvfile, zip):
     api = NbGraderAPI()    
     gradebook = api.gradebook
     
-
     archive = zipfile.ZipFile(zip)
     fnames = {}
 
@@ -19,12 +18,16 @@ def moodle_gradesheet(notebook_name, assign_name, csvfile, zip):
     # ids for each filename
     for f in archive.filelist:
         fname = f.filename
-        match = re.match("[\*\w\-\'\s\.]+_([0-9]+)_.*", fname)
+        if '.ipynb' not in fname or '__MACOSX' in fname or '.DS_Store' in fname:
+            continue
+        if '/' in fname:
+            match = re.match(".*/[\*\w\-\'\s\.]+_([0-9]+)_.*", fname)
+        else:
+            match = re.match("[\*\w\-\'\s\.]+_([0-9]+)_.*", fname)
         if match:
             fnames[match.groups()[0]] = fname
         else:
             print("Did not match ", fname)
-
     with open(csvfile, newline='', encoding='utf-8-sig') as f:
         reader = csv.DictReader(f) 
         assign_matric = {} 
@@ -34,8 +37,7 @@ def moodle_gradesheet(notebook_name, assign_name, csvfile, zip):
         problem_files = 0
             
         for line in reader:        
-            
-            ident, fullname,email, status,  grade, max_grade = (line['Identifier'], line['Full name'], line["Email address"], 
+            ident, fullname,email, status,  grade, max_grade = (line['Identifier'], line['Full name'], line["Email address"],
                                                                 line['Status'], line['Grade'], line['Maximum Grade'])
 
             should_be_submission =  "Submitted" in status
