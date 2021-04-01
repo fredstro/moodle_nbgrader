@@ -4,7 +4,7 @@ import nbgrader, csv, codecs, sys, os, shutil
 from nbgrader.apps import NbGraderAPI
 import zipfile  
 import shutil
-verbose = False
+verbose = os.getenv('VERBOSE',False)
 
 def moodle_gradesheet(notebook_name, assign_name, csvfile, zip):        
 
@@ -21,9 +21,9 @@ def moodle_gradesheet(notebook_name, assign_name, csvfile, zip):
         if '.ipynb' not in fname or '__MACOSX' in fname or '.DS_Store' in fname:
             continue
         if '/' in fname:
-            match = re.match(".*/[\*\w\-\'\s\.]+_([0-9]+)_.*", fname)
+            match = re.match(".*/[\*\w\-\'\s\.]+?_([0-9]+)_.*", fname)
         else:
-            match = re.match("[\*\w\-\'\s\.]+_([0-9]+)_.*", fname)
+            match = re.match("[\*\w\-\'\s\.]+?_([0-9]+)_.*", fname)
         if match:
             fnames[match.groups()[0]] = fname
         else:
